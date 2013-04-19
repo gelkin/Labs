@@ -1,0 +1,71 @@
+import java.io.*;
+import java.util.*;
+
+public class StackOnArr {
+	public static void main(String[] args) {
+		FileReader fr = new FileReader("stack.in");
+		/*BufferedReader in;
+		FileReader fa = new FileReader("/stack.in");
+		try {
+			in = new BufferedReader(fa);
+		} catch (FileNotFoundException f) { 
+			System.out.println("UPUPU + " + f.getMessage());
+		} 
+		
+		String s1 = "";
+		String s2 = "";
+		s1 = in.readLine();
+		s2 = in.readLine();
+		*/
+		System.out.println(str);
+		//System.out.println(s1);
+		//System.out.println(s2);
+	}
+	
+	public class ArrayStack {
+		private int size;
+		private Object[] elements = new Object[5];
+
+		public void push(Object element) {
+			assert element != null;
+
+			ensureCapacity(size + 1);
+			elements[size++] = element;
+		}
+
+
+		private void ensureCapacity(int capacity) {
+			if (capacity <= elements.length) {
+				return;
+			}
+			Object[] newElements = new Object[2 * capacity];
+			for (int i = 0; i < size; i++) {
+				newElements[i] = elements[i];
+			}
+			elements = newElements;
+		}
+
+		public Object pop() {
+			assert size > 0;
+
+			Object value = peek();
+			elements[--size] = 0;
+			return value;
+		}
+
+		public Object peek() {
+			assert size > 0;
+
+			return elements[size - 1];
+		}
+
+		public int size() {
+			return size;
+		}
+
+		public boolean isEmpty() {
+			return size == 0;
+		}
+	}
+}
+
