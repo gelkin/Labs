@@ -7,38 +7,49 @@ public class BSTSimple {
 	PrintWriter out;
 	
 	public void solve() throws IOException {
-		Priorityqueue queue = new Priorityqueue();
-		
 		String str;
+		int num;
 		int x; // First arg
 		int y; // Second arg
 		// while "".equals(str = in.next()) == true
 		
-		int counter = 0; // Counts a number of operation
+		BST set = new BST();
 		while (!"".equals(str = in.next())) {
-			if ("push".equals(str)) {
-				x = in.nextInt();
-				queue.push(x, counter);
-			} else if ("extract-min".equals(str)) {
-				if (queue.getSize() != 0) {
-					out.print(queue.extractMin());
+			num = in.nextInt();
+			System.out.println(str + " " + num);
+			switch(str) {
+			
+			case "insert":
+				set.insert(num);
+				break;
+			case "delete":
+				set.delete(num);
+				break;
+			case "exists":
+				out.println(set.exists(num));
+				break;
+			case "next":
+				if (set.next(num) == null) {
+					out.println("none");
 				} else {
-					out.print("*");
+					out.println(set.next(num).key);
 				}
-				out.print("\n");
-			} else {
-				x = in.nextInt();
-				y = in.nextInt();
-				queue.decreaseKey(x - 1, y);
+				break;
+			case "prev":
+				if (set.prev(num) == null) {
+					out.println("none");
+				} else {
+					out.println(set.prev(num).key);
+				}
+				break;
 			}
-			counter++;
 		}
 	}
 
 	public void run() {
 		try {
-			in = new FastScanner(new File("priorityqueue.in"));
-			out = new PrintWriter(new File("priorityqueue.out"));
+			in = new FastScanner(new File("bstsimple.in"));
+			out = new PrintWriter(new File("bstsimple.out"));
 
 			solve();
 
@@ -49,32 +60,194 @@ public class BSTSimple {
 	}
 	
 	class BST {
+		BST left;
+		BST right;
+		BST parent;
+		int key;
+
+		public BST() {
+		
+		}
+		
+		public BST(BST left, BST right, BST parent, int key) {
+			this.left = left;
+			this.right = right;
+			this.parent = parent;
+			this.key = key;
+		}
+		
+		void insert(int x) {
+			if (this.left == null && this.right == null && this.parent == null && this.key == 0) {
+				this.key = x;
+				return;
+			}
+			if (x > this.key) {
+				System.out.println("zzz");
+				if (this.right != null) {
+					this.right.insert(x);
+				} else {
+					BST element = new BST(null, null, this, x);
+					this.right = element;
+				}
+			} else {
+				if (this.left != null) {
+					this.left.insert(x);
+				} else {
+					BST element = new BST(null, null, this, x);
+					this.left = element;
+				}
+			}
+		}
+		
+		public BST find(int x) {
+			if (this == null || x == this.key) {
+				// System.out.println("yyy");
+				return this;
+			}
+			if (x < this.key) {
+				// System.out.println("yyy");
+				if (this.left != null) {
+					// System.out.println("XXX TODO");
+					return this.left.find(x);
+				}
+				return null;
+			} else {
+				if (this.left != null) {
+					return this.right.find(x);
+				}
+				// System.out.println("yyy");
+				return null;
+			}
+		}
+		
+		public String exists(int x) {
+			if (this.find(x) == null) {
+				return "false";
+			}
+			return "true";
+		}
+		
+		public BST minimum() {
+			if (this.left == null) {
+				return this;
+			}
+			return this.left.minimum();
+		}
+		
+		public BST maximum() {
+			if (this.right == null) {
+				return this;
+			}
+			return this.right.maximum();
+		}
+		
+		
+		
+		public void delete(int x) {
+			BST cur = this.find(x);
+			if (cur == null) {
+				return;
+			}
+			BST next;
+			BST child;
+			
+			if (cur.left != null && cur.right != null) {
+				next = next(cur.key);
+				child = new BST(null, null, null, 0);
+				if (next == next.parent.left) {
+					next.parent.left = null;
+				} else {
+					next.parent.right = null;
+				}
+				cur.key = next.key;
+				cur.left = next.left;
+				cur.right = next.right;
+				cur.parent = next.parent; 
+			} else if (cur.left != null || cur.right != null){
+				next = cur;
+				if (next.left != null) {
+					child = next.left;
+				} else {
+					child = next.right;
+				}
+			} else {
+				next = cur;
+				child = null;
+			}
+			if (child != null) {
+				child.parent = next.parent;
+			}
+			if (next.parent == null) {
+				key = child.key;
+				left = child.left;
+				right = child.right;
+				parent = null;
+			} else if (next == next.parent.left){
+				next.parent.left = child;
+			} else {
+				next.parent.right = child;
+			}
+			
+		}
+		
+		/*
+		public BST pureNext(int x) {
+			if (this.key == x) {
+				return this;
+			} else if (this.key < x) {
+				if (this.right.key <= x) {
+					return this.right.pureNext(x);
+				} else {
+					
+				}
+			} else {
+				if (/* TODO ) {}
+				return this.left.pureNext(x);
+			}
+			
+		}
+		*/
+		
+		public BST next(int x) { // if (exists): show key: show "none"
+			if (this.right != null) {
+				return this.right.minimum();
+			}
+			BST curparent = this.parent;
+			BST cur = this; 
+			while (curparent != null && cur == curparent.right) {
+				cur = curparent;
+				curparent = curparent.parent;
+			}
+			return curparent;
+		}
+		
+		public BST prev(int x) { // if (exists): show key: show "none"
+			if (this.left != null) {
+				return this.left.maximum();
+			}
+			BST curparent = this.parent;
+			BST cur = this;
+			while (curparent != null && cur == curparent.left) {
+				cur = curparent;
+				curparent = curparent.parent;
+			}
+			return curparent;
+		}
+	}
+	
+	class Node {
 		Node left;
 		Node right;
 		Node parent;
 		int key;
 
-	}
-	
-	class Node {
-		private Object element;
-		private Node next;
-
-		public Object getElement(){
-			return element;
+		public Node(Node left, Node right, Node parent, int key) {
+			this.left = left;
+			this.right = right;
+			this.parent = parent;
+			this.key = key;
 		}
-
-		public void setElement(Object e){
-			element = e;
-		}
-
-		public Node getNext() {
-			return next;
-		}
-
-		public void setNext(Node n) {
-			next = n;
-		}
+		
 	}
 	
 	class FastScanner {
@@ -125,6 +298,6 @@ public class BSTSimple {
 	}
 
 	public static void main(String[] args) {
-		new BSTSimple.run();
+		new BSTSimple().run();
 	}
 }
