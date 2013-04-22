@@ -13,7 +13,7 @@ public class BSTSimple {
 		int y; // Second arg
 		// while "".equals(str = in.next()) == true
 		
-		BST set = new BST();
+		BST set = new BST(null, null, null, 123456789);
 		while (!"".equals(str = in.next())) {
 			num = in.nextInt();
 			System.out.println(str + " " + num);
@@ -29,19 +29,21 @@ public class BSTSimple {
 				out.println(set.exists(num));
 				break;
 			case "next":
-				if (set.next(num) == null) {
+				if (set.key == 123456789 || set.pureNext(set, num) == null) {
 					out.println("none");
 				} else {
-					out.println(set.next(num).key);
+					out.println(set.pureNext(set, num).key);
 				}
 				break;
 			case "prev":
-				if (set.prev(num) == null) {
+				if (set.key == 123456789 || set.purePrev(set, num) == null) {
 					out.println("none");
 				} else {
-					out.println(set.prev(num).key);
+					out.println(set.purePrev(set, num).key);
 				}
 				break;
+			default:
+				System.out.println("Ошибка!");
 			}
 		}
 	}
@@ -65,9 +67,9 @@ public class BSTSimple {
 		BST parent;
 		int key;
 
-		public BST() {
+		/*public BST() {
 		
-		}
+		}*/
 		
 		public BST(BST left, BST right, BST parent, int key) {
 			this.left = left;
@@ -77,12 +79,15 @@ public class BSTSimple {
 		}
 		
 		void insert(int x) {
-			if (this.left == null && this.right == null && this.parent == null && this.key == 0) {
+			if (this.find(x) != null) {
+				return;
+			}
+			if (this.left == null && this.right == null && this.parent == null && this.key == 123456789) {
 				this.key = x;
 				return;
 			}
 			if (x > this.key) {
-				System.out.println("zzz");
+				//System.out.println("zzz");
 				if (this.right != null) {
 					this.right.insert(x);
 				} else {
@@ -99,23 +104,45 @@ public class BSTSimple {
 			}
 		}
 		
+		public BST pureNext(BST set, int x) {
+			if (set == null) {
+				return null;
+			}
+			if (set.key <= x) {
+				return pureNext(set.right, x);	
+			} else {
+				BST y = pureNext(set.left, x);
+				return (y == null)? set : y;
+			}
+			
+		}
+		
+		public BST purePrev(BST set, int x) {
+			if (set == null) {
+				return null;
+			}
+			if (set.key >= x) {
+				return purePrev(set.left, x);	
+			} else {
+				BST y = purePrev(set.right, x);
+				return (y == null)? set : y;
+			}
+			
+		}
+		
 		public BST find(int x) {
 			if (this == null || x == this.key) {
-				// System.out.println("yyy");
 				return this;
 			}
 			if (x < this.key) {
-				// System.out.println("yyy");
 				if (this.left != null) {
-					// System.out.println("XXX TODO");
 					return this.left.find(x);
 				}
 				return null;
 			} else {
-				if (this.left != null) {
+				if (this.right != null) {
 					return this.right.find(x);
 				}
-				// System.out.println("yyy");
 				return null;
 			}
 		}
@@ -142,9 +169,17 @@ public class BSTSimple {
 		}
 		
 		
-		
 		public void delete(int x) {
+			if (this.left == null && this.right == null && this.parent == null) {
+				if (this.key == x) {
+					this.key = 123456789;
+					return;
+				}
+				return;
+			}
+		
 			BST cur = this.find(x);
+			System.out.println(cur.key + " " + x);
 			if (cur == null) {
 				return;
 			}
@@ -164,8 +199,10 @@ public class BSTSimple {
 				cur.right = next.right;
 				cur.parent = next.parent; 
 			} else if (cur.left != null || cur.right != null){
+				System.out.println("O eah, baby");
 				next = cur;
 				if (next.left != null) {
+					System.out.println("Double dare you!!!");
 					child = next.left;
 				} else {
 					child = next.right;
@@ -175,6 +212,7 @@ public class BSTSimple {
 				child = null;
 			}
 			if (child != null) {
+				System.out.println("If you know what I mean");
 				child.parent = next.parent;
 			}
 			if (next.parent == null) {
@@ -189,24 +227,6 @@ public class BSTSimple {
 			}
 			
 		}
-		
-		/*
-		public BST pureNext(int x) {
-			if (this.key == x) {
-				return this;
-			} else if (this.key < x) {
-				if (this.right.key <= x) {
-					return this.right.pureNext(x);
-				} else {
-					
-				}
-			} else {
-				if (/* TODO ) {}
-				return this.left.pureNext(x);
-			}
-			
-		}
-		*/
 		
 		public BST next(int x) { // if (exists): show key: show "none"
 			if (this.right != null) {
