@@ -1,0 +1,126 @@
+import java.util.*;
+import java.io.*;
+
+public class StackFirst {
+
+	FastScanner in;
+	PrintWriter out;
+
+	public void solve() throws IOException {
+		ArrayStack stack = new ArrayStack();
+		int num = in.nextInt();
+		for (int i = 0; i < num; ++i) {
+			if("+".equals(in.next())) {
+				stack.push(in.nextInt());
+			} else {
+				out.println(stack.pop());
+			}
+		}
+	}
+
+	public void run() {
+		try {
+			in = new FastScanner(new File("stack1.in"));
+			out = new PrintWriter(new File("stack1.out"));
+
+			solve();
+
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public class ArrayStack {
+		private int size;
+		private Object[] elements = new Object[2];
+
+		public void push(Object element) {
+			assert element != null;
+
+			ensureCapacity(size + 1);
+			elements[size++] = element;
+		}
+
+
+		private void ensureCapacity(int capacity) {
+			if (capacity <= elements.length) {
+				return;
+			}
+			Object[] newElements = new Object[2 * capacity];
+			for (int i = 0; i < size; i++) {
+				newElements[i] = elements[i];
+			}
+			elements = newElements;
+		}
+
+		public Object pop() {
+			assert size > 0;
+
+			Object value = peek();
+			System.out.println("Size   :: " + size());
+			System.out.println("Length :: " + elements.length + "\n");
+			elements[size - 1] = 0;
+			decCapacity(size - 1);
+			size--;
+			return value;
+		}
+
+		private void decCapacity(int capacity) {
+			if (capacity > (elements.length / 4)) {
+				return;
+			}
+			Object[] newElements = new Object[elements.length / 2];
+			for (int i = 0; i < (elements.length / 4); i++) {
+				newElements[i] = elements[i];
+			}
+			elements = newElements;
+		}
+
+		public Object peek() {
+			assert size > 0;
+
+			return elements[size - 1];
+		}
+
+		public int size() {
+			return size;
+		}
+
+		public boolean isEmpty() {
+			return size == 0;
+		}
+	}
+	
+	class FastScanner {
+		BufferedReader br;
+		StringTokenizer st;
+
+		FastScanner(File f) {
+			try {
+				br = new BufferedReader(new FileReader(f));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		String next() {
+			while (st == null || !st.hasMoreTokens()) {
+				try {
+					st = new StringTokenizer(br.readLine());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			return st.nextToken();
+		}
+
+		int nextInt() {
+			return Integer.parseInt(next());
+		}
+	}
+
+	public static void main(String[] args) {
+		new StackFirst().run();
+	}
+}
