@@ -1,0 +1,165 @@
+import java.util.*;
+import java.io.*;
+
+public class MainNet {
+
+	FastScanner in;
+	PrintWriter out;
+	
+	class Pair {
+		int num;
+		int length;
+		
+		public Pair(int num, int length) {
+			this.num = num;
+			this.length = length;
+		}
+	}
+	
+	// in: str.length <= 16, "str" consists of only '0' or '1' chars
+	// out: num - non-negative integer
+	Pair binStringToNumber(String str) {
+		int num = 0;
+		int length = 0;
+		for (int i = str.length() - 1; i >= 0; i--) {
+			if (str.charAt(i) != '0') {
+				num += Math.pow(2, str.length() - i - 1);
+				length++;
+			}
+		}
+		return new Pair(num, length);
+	}
+	
+	Pair sortWithNet(int num, int[] comps, int m, int n) {
+		String str = Integer.toBinaryString(num);
+		for (int i = str.length(); i < n; i++) {
+			str = "0" + str;
+		}
+		char tmp1;
+		char tmp2;
+		int l = str.length() - 1;
+		for (int i = 0; i < m; i++) {
+			tmp1 = str.charAt(comps[2 * i]);
+			tmp2 = str.charAt(comps[2 * i + 1]);
+			if (Integer.parseInt(Character.toString(tmp1)) > Integer.parseInt(Character.toString(tmp2))) {
+				if (comps[2 * i + 1] - 1 - comps[2 * i] - 1 > 0) {
+					str.substring(comps[2 * i] + 1, comps[2 * i + 1] - 1);
+					str = str.substring(0, Math.max(comps[2 * i] - 1, 0)) + tmp2
+					+ str.substring(comps[2 * i] + 1, comps[2 * i + 1]) + tmp1
+					+ str.substring(Math.min(comps[2 * i + 1] + 1, l + 1));
+				} else {
+					str = str.substring(0, Math.max(comps[2 * i], 0)) + tmp2
+					+ tmp1 + str.substring(Math.min(comps[2 * i + 1] + 1, l + 1));
+					
+				}
+			}
+		}
+		return binStringToNumber(str);
+	}
+	
+	boolean check(Pair x) {
+		if (x.num != Math.pow(2, x.length) - 1) {
+			return false;
+		}
+		return true;
+	}
+	
+	boolean ifSortNet(int[] comps, int n, int m) {
+		for (int i = 0; i < Math.pow(2, n); i++) {
+			if (!check(sortWithNet(i, comps, m, n))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public void solve() throws IOException {
+		String str;
+		int n = in.nextInt();
+		int m = in.nextInt();
+		int k = in.nextInt();
+		int x = 0;
+		int y = 0;
+		int[] comps = new int[2 * m];
+		
+		while (!"".equals(str = in.next())) {
+			x = Integer.parseInt(str);
+			y += x;
+			for (int i = y - x; i < y; i++) {
+				comps[2 * i] = in.nextInt() - 1;
+				comps[2 * i + 1] = in.nextInt() - 1;
+			}
+		}
+		
+		if (ifSortNet(comps, n, m)) {
+			out.println("YES");
+		} else {
+			out.println("NO");
+		}
+		
+	}
+
+	public void run() {
+		try {
+			in = new FastScanner(new File("netcheck.in"));
+			out = new PrintWriter(new File("netcheck.out"));
+
+			solve();
+
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	class FastScanner {
+		BufferedReader br;
+		StringTokenizer st;
+		boolean Check;
+		String line;
+
+		FastScanner(File f) {
+			try {
+				br = new BufferedReader(new FileReader(f));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		boolean getCheck() {
+			return Check;
+		}
+
+		void setCheck(boolean b) {
+			Check = b;
+		}
+
+		String next() {
+			try {
+				if (st == null || !st.hasMoreTokens()) {
+					if ((line = br.readLine()) != null) {
+						st = new StringTokenizer(line);
+						setCheck(true);
+					} else {
+						setCheck(false);
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (getCheck()) {
+				return st.nextToken();
+			} else {
+				return "";
+			} 
+		}
+
+		int nextInt() {
+			return Integer.parseInt(next());
+		}
+	}
+
+	public static void main(String[] args) {
+		new MainNet().run();
+	}
+}

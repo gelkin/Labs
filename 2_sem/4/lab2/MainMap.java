@@ -1,0 +1,174 @@
+import java.util.*;
+import java.io.*;
+
+public class MainMap {
+
+	FastScanner in;
+	PrintWriter out;
+	
+	public final int MAX = 3780503;
+	public final int p = 31;
+	
+	public void solve() throws IOException {
+		String str;
+		// int num;
+		String x; // First arg
+		String y; // Second arg
+		// while "".equals(str = in.next()) == true
+		
+		Map map = new Map();
+		while (!"".equals(str = in.next())) {
+			x = in.next();
+			
+			switch(str) {
+			
+			case "put":
+				y = in.next();
+				map.put(x, y);
+				break;
+			case "delete":
+				map.delete(x);
+				break;
+			case "get":
+				out.println(map.get(x));
+				break;
+			default:
+				System.out.println("Ошибка!");
+			}
+		}
+	}
+
+	public void run() {
+		try {
+			in = new FastScanner(new File("map.in"));
+			out = new PrintWriter(new File("map.out"));
+
+			solve();
+
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	class Map {
+		private ArrayList<Pair>[] map = new ArrayList[MAX];
+		
+		
+		private int hash(String str) {
+			int[] pow = new int[str.length()];
+			pow[0] = 1;
+			for (int i = 1; i < str.length(); i++) {
+    			pow[i] = pow[i - 1] * p;
+			}
+			int y = str.charAt(0);
+			for (int i = 1; i < str.length(); i++) {
+				y += (str.charAt(i) - 'a' + 1) * pow[i];
+			}
+			return (Math.abs(y) % MAX);
+		}
+		
+		String get(String x) {
+			int y = hash(x);
+			if (map[y] == null) {
+				return "none";
+			}
+			for (int i = 0; i < map[y].size(); i++) {
+				if (x.equals(map[y].get(i).key)) {
+					return map[y].get(i).value;
+				}
+			}
+			return "none";
+		}
+		
+		void put(String x, String z) {
+			int y = hash(x);
+			if (map[y] == null) {
+				map[y] = new ArrayList();
+				map[y].add(new Pair(x, z));
+				return;
+			}
+			for (int i = 0; i < map[y].size(); i++) {
+				if (x.equals(map[y].get(i).key)) {
+					map[y].get(i).value = z;
+					return;
+				}
+			}
+			map[y].add(new Pair(x, z));
+		}
+		
+		void delete(String x) {
+			int y = hash(x);
+			if (map[y] == null) {
+				return;
+			}
+			for (int i = 0; i < map[y].size(); i++) {
+				if (x.equals(map[y].get(i).key)) {
+					map[y].remove(i);
+					return;
+				}
+			}
+		}
+	}
+	
+	class Pair {
+		public String key;
+		public String value;
+		
+		public Pair(String key, String value) {
+			this.key = key;
+			this.value = value;
+		}
+	}
+
+	class FastScanner {
+		BufferedReader br;
+		StringTokenizer st;
+		boolean Check;
+		String line;
+
+		FastScanner(File f) {
+			try {
+				br = new BufferedReader(new FileReader(f));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		boolean getCheck() {
+			return Check;
+		}
+
+		void setCheck(boolean b) {
+			Check = b;
+		}
+
+		String next() {
+			try {
+				if (st == null || !st.hasMoreTokens()) {
+					if ((line = br.readLine()) != null) {
+						st = new StringTokenizer(line);
+						setCheck(true);
+					} else {
+						setCheck(false);
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (getCheck()) {
+				return st.nextToken();
+			} else {
+				return "";
+			} 
+		}
+
+		int nextInt() {
+			return Integer.parseInt(next());
+		}
+	}
+
+	public static void main(String[] args) {
+		new MainMap().run();
+	}
+}

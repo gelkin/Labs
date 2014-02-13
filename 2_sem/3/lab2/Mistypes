@@ -1,0 +1,2 @@
+1. in: treeSuccessor:
+	need "!isNil(x.right)" instead of "!isNil(x.left)"

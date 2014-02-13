@@ -1,0 +1,24 @@
+public class Test {
+	class First {
+		public int key = 100;
+		public First child;
+		
+		public void decreaseKey(int x) {
+			this.key -= x;
+			if (this.child != null) {
+				this.child.decreaseKey(8*x);		
+			}
+		}
+	}
+	
+	public void run(){
+		First element = new First();
+		element.child = new First();
+		element.decreaseKey(15);
+		System.out.println(element.child.key);
+	}
+	
+	public static void main(String[] args){
+		new Test().run();
+	}
+}

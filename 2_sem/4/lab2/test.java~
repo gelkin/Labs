@@ -1,0 +1,9 @@
+import java.util.*;
+import java.io.*;
+
+public class test {
+	public static void main(String[] args) {
+		Vector<String>[] str = (Vector<String>[]) new Object[100];
+		//System.out.println(str.codePointAt(2) + " " + i);
+	}
+}
